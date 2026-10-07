@@ -57,7 +57,7 @@ class AccountScreen extends StatelessWidget {
       ActionRow(Icons.dashboard_customize_outlined,s.t('استوديو الإدارة التجريبي','Admin design studio'),
         subtitle:s.t('معاينة منفصلة لوظائف الإدارة','Separate preview of administration features'),
         onTap:()=>go(context,const AdminScreen())),
-      const Note('Digital Lab • Design edition 0.2'),
+      const Note('Digital Lab • Design edition 0.3'),
     ]);
   }
 }

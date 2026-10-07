@@ -282,7 +282,7 @@ class StoryStrip extends StatelessWidget {
     final s=AppScope.of(context);
     final labels=[s.t('من البيت','At home'),s.t('افهم تقريرك','Your report'),s.t('مساحة العائلة','Family space'),s.t('مكافآتك','Rewards')];
     final icons=[Icons.home_outlined,Icons.analytics_outlined,Icons.people_outline,Icons.redeem_outlined];
-    return SizedBox(height:104*MediaQuery.textScalerOf(context).scale(1),child:ListView.separated(
+    return SizedBox(height:82+36*MediaQuery.textScalerOf(context).scale(1),child:ListView.separated(
       scrollDirection:Axis.horizontal,itemCount:4,separatorBuilder:(_,i)=>const SizedBox(width:14),
       itemBuilder:(context,i)=>SizedBox(width:86,child:InkWell(
         key:ValueKey('story-$i'),borderRadius:BorderRadius.circular(18),
@@ -292,8 +292,8 @@ class StoryStrip extends StatelessWidget {
             border:Border.all(width:2,color:s.viewedStories.contains(i)?accent.withAlpha(40):accent)),
             child:Container(width:56,height:56,decoration:BoxDecoration(shape:BoxShape.circle,
               color:surface(context)),child:Icon(icons[i],size:26,color:Theme.of(context).colorScheme.primary))),
-          const SizedBox(height:8),Text(labels[i],textAlign:TextAlign.center,
-            style:const TextStyle(fontSize:11,fontWeight:FontWeight.w700)),
+          const SizedBox(height:8),Text(labels[i],textAlign:TextAlign.center,maxLines:2,overflow:TextOverflow.ellipsis,
+            style:const TextStyle(fontSize:11,fontWeight:FontWeight.w700,height:1.4)),
         ])))));
   }
 }

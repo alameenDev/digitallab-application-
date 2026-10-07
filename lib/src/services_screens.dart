@@ -476,7 +476,7 @@ class _AdminModuleScreenState extends State<AdminModuleScreen> {
         ...flags.keys.map((k)=>SwitchListTile(value:flags[k]!,title:Text(
           k=='home'?s.t('السحب المنزلي','Home collection'):k=='consultations'?s.t('الاستشارات','Consultations'):s.t('الصيانة','Maintenance')),
           onChanged:(v)=>setState(()=>flags[k]=v))),
-        const Note('Design version: 0.2.0 • Minimum supported version: not configured'),
+        const Note('Design version: 0.3.0 • Minimum supported version: not configured'),
       ],
       if(m=='audit') ...[
         Heading(s.t('الأدوار وسجل الإجراءات','Roles & audit trail')),
