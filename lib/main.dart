@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'patient_mobile/screens.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,6 +13,7 @@ part 'src/booking.dart';
 part 'src/account_screens.dart';
 part 'src/services_screens.dart';
 
+const patientApiBaseUrl = String.fromEnvironment('PATIENT_API_BASE_URL');
 void main() => runApp(DigitalLabApp());
 
 class DigitalLabApp extends StatefulWidget {
@@ -34,7 +36,7 @@ class _DigitalLabAppState extends State<DigitalLabApp> {
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
-        themeMode: widget.store.themeMode,
+        themeMode: patientApiBaseUrl.isEmpty ? widget.store.themeMode : ThemeMode.light,
         builder: (context, child) {
           final media = MediaQuery.of(context);
           return MediaQuery(
@@ -43,7 +45,7 @@ class _DigitalLabAppState extends State<DigitalLabApp> {
             child: child!,
           );
         },
-        home: const AppShell(),
+        home: patientApiBaseUrl.isEmpty ? const AppShell() : const PatientMobileRoot(baseUrl: patientApiBaseUrl),
       ),
     ),
   );
