@@ -1,0 +1,46 @@
+name: Flutter checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Flutter SDK
+        run: |
+          git clone --depth 1 --branch 3.35.7 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - name: Resolve packages
+        run: flutter pub get
+      - name: Analyze
+        run: flutter analyze
+      - name: Test
+        run: flutter test
+      - name: Build web
+        run: flutter build web --release
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-lab-web
+          path: build/web
+      - name: Install preview browser
+        run: |
+          npm install --prefix "$RUNNER_TEMP/browser" playwright@1.56.1
+          "$RUNNER_TEMP/browser/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Capture interface previews
+        env:
+          NODE_PATH: ${{ runner.temp }}/browser/node_modules
+        run: |
+          python3 -m http.server 8000 --directory build/web > "$RUNNER_TEMP/web-server.log" 2>&1 &
+          node tool/capture.cjs
+      - name: Upload previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-lab-previews
+          path: previews

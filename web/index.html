@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="description" content="Digital Lab — Interactive patient application design prototype">
+  <meta name="theme-color" content="#112f3b">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Digital Lab — المختبر الرقمي</title>
+  <style>
+    html,body { margin:0; background:#f5f7f8; height:100%; }
+    #loading { height:100%; display:grid; place-content:center; text-align:center; font-family:Arial,sans-serif; color:#112f3b; gap:12px; }
+    .mark { margin:auto; width:64px; height:64px; background:#087f7b; border-radius:20px; color:white; display:grid; place-items:center; font-size:42px; }
+    small { color:#637d83; }
+  </style>
+</head>
+<body>
+  <div id="loading" role="status"><div class="mark">+</div><strong>Digital Lab</strong><small>المختبر الرقمي • جارٍ التحميل</small></div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      document.getElementById('loading')?.remove();
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

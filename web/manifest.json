@@ -1,0 +1,11 @@
+{
+  "name": "Digital Lab",
+  "short_name": "Digital Lab",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f7f8",
+  "theme_color": "#112f3b",
+  "description": "Digital Lab patient design prototype",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

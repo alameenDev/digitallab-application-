@@ -1,0 +1,20 @@
+const { chromium } = require('playwright');
+const fs = require('fs');
+(async () => {
+  fs.mkdirSync('previews', { recursive: true });
+  const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('http://127.0.0.1:8000', { waitUntil: 'networkidle' });
+  await page.waitForFunction(() => document.querySelector('flutter-view') !== null, { timeout: 60000 });
+  await page.waitForTimeout(5000);
+  await page.screenshot({ path: 'previews/home-ar-mobile.png' });
+  await page.setViewportSize({ width: 1366, height: 1000 });
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: 'previews/home-ar-desktop.png' });
+  console.log('PREVIEW_MOBILE_BASE64=' + fs.readFileSync('previews/home-ar-mobile.png').toString('base64'));
+  fs.writeFileSync('previews/browser-errors.json', JSON.stringify(errors, null, 2));
+  await browser.close();
+  if (errors.length) throw new Error(errors.join('\n'));
+})().catch(error => { console.error(error); process.exit(1); });
