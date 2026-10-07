@@ -28,8 +28,11 @@ class AccountScreen extends StatelessWidget {
         ])),const Icon(Icons.arrow_outward,color:Colors.white,size:20),
       ])),
       Section(s.t('صحتي وعائلتي','My health & family')),
+      ActionRow(Icons.checklist_rtl,s.t('خطة العناية','Care planner'),
+        subtitle:s.t('قائمة ومذكرة مستقلة لكل فرد','A separate checklist and note for each person'),
+        onTap:()=>go(context,const CarePlanScreen())),
       ActionRow(Icons.people_outline,s.t('أفراد العائلة','Family profiles'),
-        subtitle:s.t('ملف مستقل لكل شخص','A separate profile for every person'),onTap:()=>go(context,const FamilyScreen())),
+        subtitle:s.t('ملف مستقل لكل شخص','A separate profile for every person'),onTap:()=>go(context,const FamilyHub())),
       ActionRow(Icons.medical_information_outlined,s.t('معلوماتي الصحية','Medical information'),
         onTap:()=>go(context,const MedicalScreen())),
       ActionRow(Icons.folder_open_outlined,s.t('مستنداتي ووصفاتي','Documents & prescriptions'),
@@ -228,40 +231,7 @@ class _SharingScreenState extends State<SharingScreen> {
 }
 class RewardsScreen extends StatelessWidget {
   const RewardsScreen({super.key});
-  @override Widget build(BuildContext context) {
-    final s=AppScope.of(context);
-    return DetailPage(title:s.t('نقاط ومكافآت','Points & rewards'),children:[
-      Panel(color:midnight,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        const Icon(Icons.workspace_premium_outlined,color:Color(0xFFEAC68C),size:45),
-        const SizedBox(height:18),Text(s.t('ذهبي • حساب تجريبي','GOLD • DEMO ACCOUNT'),style:const TextStyle(color:Color(0xFFEAC68C))),
-        const SizedBox(height:10),Text('${s.points}',style:const TextStyle(color:Colors.white,fontSize:48,fontWeight:FontWeight.w800)),
-        Text(s.t('نقطة متاحة للاستبدال التجريبي','points available for demo redemption'),style:const TextStyle(color:Colors.white70)),
-        const SizedBox(height:20),
-        const LinearProgressIndicator(value:.7,backgroundColor:Colors.white12,color:Color(0xFFEAC68C),minHeight:6),
-        const SizedBox(height:10),Text(s.t('مستوى العضوية للعرض؛ يُحدد نظام الترقية لاحقاً.','Illustrative tier; upgrade rules will be configured later.'),
-          style:const TextStyle(color:Colors.white70,fontSize:11)),
-      ])),
-      Section(s.t('مستويات العضوية','Membership tiers')),
-      Wrap(spacing:8,runSpacing:8,children:[
-        Tag(s.t('برونزي','Bronze'),color:amber),Tag(s.t('فضي','Silver')),
-        Tag(s.t('ذهبي','Gold'),color:amber),Tag(s.t('بلاتيني','Platinum')),
-      ]),
-      Section(s.t('مكافأة لك','A little thank you')),
-      Panel(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Text(s.t('قسيمة تجريبية • 500 نقطة','Demo voucher • 500 points'),
-          style:const TextStyle(fontSize:19,fontWeight:FontWeight.w800)),
-        const SizedBox(height:10),Text(s.t('تجربة استبدال النقاط، بدون قيمة مالية فعلية.',
-          'Try the redemption flow. This has no real monetary value.')),
-        const SizedBox(height:18),FilledButton(onPressed:s.points>=500?s.redeem:null,
-          child:Text(s.t('استبدال 500 نقطة','Redeem 500 points'))),
-      ])),
-      Section(s.t('حركة النقاط','Points activity')),
-      ActionRow(Icons.add_circle_outline,s.t('رصيد افتتاحي تجريبي','Demo opening balance'),trailing:const Text('+2,450')),
-      ...s.rewards.map((code)=>ActionRow(Icons.redeem,code,subtitle:s.t('قسيمة تجريبية مستبدلة','Demo voucher redeemed'),trailing:const Text('−500'))),
-      Note(s.t('النقاط المعلقة والانتهاء وقواعد الكسب تُدار في الخدمة الخلفية لاحقاً.',
-        'Pending points, expiry and earning rules will be managed by the backend.')),
-    ]);
-  }
+  @override Widget build(BuildContext context) => const LoyaltyExperience();
 }
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});

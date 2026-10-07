@@ -10,9 +10,10 @@ String modeLabel(AppStore s,String mode) {
   }
 }
 class BookingScreen extends StatefulWidget {
-  const BookingScreen(this.service,{super.key,this.home=false});
+  const BookingScreen(this.service,{super.key,this.home=false,this.couponCode=''});
   final Service service;
   final bool home;
+  final String couponCode;
   @override State<BookingScreen> createState()=>_BookingScreenState();
 }
 class _BookingScreenState extends State<BookingScreen> {
@@ -20,7 +21,10 @@ class _BookingScreenState extends State<BookingScreen> {
   final form=GlobalKey<FormState>();
   late String mode=widget.home?'home':'clinic';
   String? patientId;
-  String phone='',address='',notes='',coupon='',payment='provider';
+  String phone='',address='',notes='',payment='provider';
+  late String coupon=widget.couponCode;
+  String appliedCode='';
+  bool couponInitialized=false;
   DateTime date=DateTime.now().add(const Duration(days:1));
   int hour=9;
   bool consent=false;
@@ -29,6 +33,11 @@ class _BookingScreenState extends State<BookingScreen> {
   @override Widget build(BuildContext context) {
     final s=AppScope.of(context);
     final service=widget.service;
+    if(!couponInitialized){
+      couponInitialized=true;
+      appliedCode=coupon.trim().toUpperCase();
+      discount=s.discountFor(service,appliedCode);
+    }
     final total=service.price+(mode=='home'?10000:0)-discount;
     final steps=[s.t('المعلومات','Details'),s.t('الموعد','Appointment'),s.t('المراجعة','Review')];
     patientId??=s.patientId;
@@ -109,10 +118,15 @@ class _BookingScreenState extends State<BookingScreen> {
             textCapitalization:TextCapitalization.characters,
             decoration:InputDecoration(labelText:s.t('كود الخصم','Promo code'),hintText:'DIGITAL10',
               suffixIcon:TextButton(onPressed:(){
-                setState(()=>discount=promoDiscount(service,coupon));
+                setState((){
+                  appliedCode=coupon.trim().toUpperCase();
+                  discount=s.discountFor(service,appliedCode);
+                });
                 toast(context,discount>0?s.t('تم تطبيق خصم الباقة','Package discount applied'):
-                  s.t('الكود متاح للباقات فقط: DIGITAL10','This code applies to packages only: DIGITAL10'));
-              },child:Text(s.t('تطبيق','Apply')))),onChanged:(v)=>coupon=v),
+                  s.t('تحقق من الكود. القسيمة يجب أن تكون متاحة وعلى باقة.','Check the code. Vouchers must be available and apply to a package.'));
+              },child:Text(s.t('تطبيق','Apply')))),onChanged:(v)=>setState((){
+              coupon=v;discount=0;appliedCode='';
+            })),
           const SizedBox(height:16),
           DropdownButtonFormField<String>(value:payment,
             decoration:InputDecoration(labelText:s.t('طريقة الدفع','Payment method')),
@@ -132,12 +146,18 @@ class _BookingScreenState extends State<BookingScreen> {
             if(!form.currentState!.validate())return;
             if(step<2){setState(()=>step++);return;}
             if(!consent){toast(context,s.t('يرجى تأكيد الموافقة على النسخة التجريبية','Please acknowledge the demo'));return;}
+            if(discount!=s.discountFor(service,appliedCode)){
+              setState(()=>discount=s.discountFor(service,appliedCode));
+              toast(context,s.t('تغيّر توفر القسيمة. راجع الإجمالي وأكّد مرة أخرى.',
+                'Voucher availability changed. Review the total and confirm again.'));return;
+            }
             submitted=true;
             final booking=Booking(id:'DL-${1001+s.bookings.length}',serviceId:service.id,patientId:patientId!,
               date:DateTime(date.year,date.month,date.day,hour),phone:phone.trim(),
               address:mode=='home'?address.trim():'',notes:notes.trim(),mode:mode,payment:payment,
-              total:total,discount:discount);
+              total:total,discount:discount,voucherCode:discount>0?appliedCode:'');
             s.addBooking(booking);
+            if(discount>0)s.useVoucher(appliedCode);
             Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder:(_)=>BookingDetailScreen(booking)));
           },
           child:Text(step==2?s.t('تأكيد الحجز التجريبي','Confirm demo booking'):s.t('متابعة','Continue'))),

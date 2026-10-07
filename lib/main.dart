@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 part 'src/state.dart';
+part 'src/experience.dart';
 part 'src/components.dart';
 part 'src/core_screens.dart';
 part 'src/booking.dart';

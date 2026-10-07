@@ -3,92 +3,7 @@ part of '../main.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key,required this.onTab});
   final ValueChanged<int> onTab;
-  @override
-  Widget build(BuildContext context) {
-    final s=AppScope.of(context);
-    final upcoming=s.bookings.where((b)=>b.status=='upcoming' && b.patientId==s.patientId);
-    return ScreenBody(children:[
-      Heading(s.t('أهلاً، ${s.patient.name.split(' ').first} 👋','Hello, ${s.patient.name.split(' ').first}'),
-        subtitle:s.t('خطوة صغيرة اليوم، لصحة أفضل دائماً.','A little care today. A healthier tomorrow.'),
-        trailing:IconButton(tooltip:s.t('تبديل الملف','Switch profile'),
-          onPressed:()=>go(context,const FamilyScreen()),icon:const Icon(Icons.people_outline))),
-      ClipRRect(borderRadius:BorderRadius.circular(26),child:ColoredBox(color:midnight,
-        child:Stack(children:[
-          PositionedDirectional(end:-50,top:-35,child:IgnorePointer(child:SizedBox(
-            width:250,height:250,child:CustomPaint(painter:MoleculePainter())))),
-          Padding(padding:const EdgeInsets.all(25),child:Column(
-            crossAxisAlignment:CrossAxisAlignment.start,children:[
-              Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:5),
-                decoration:BoxDecoration(color:Colors.white12,borderRadius:BorderRadius.circular(8)),
-                child:Text(s.t('رعايتك، أقرب إليك','CARE THAT COMES CLOSER'),
-                  style:const TextStyle(color:Color(0xFF9DE4C9),fontSize:11,fontWeight:FontWeight.w700))),
-              const SizedBox(height:16),
-              Text(s.t('صحتك تستحق\nاهتماماً مختلفاً.','Your health.\nA little more personal.'),
-                style:const TextStyle(color:Colors.white,fontSize:30,fontWeight:FontWeight.w800,height:1.45)),
-              const SizedBox(height:10),
-              Text(s.t('احجز فحوصاتك من مكانك، وتابع نتائجك بسهولة.','Book from home. Keep your results close.'),
-                style:const TextStyle(color:Color(0xFFC7DCD9),fontSize:13,height:1.8)),
-              const SizedBox(height:20),
-              FilledButton.icon(onPressed:()=>go(context,const ExploreScreen(initialKind:'home',standalone:true)),
-                style:FilledButton.styleFrom(backgroundColor:const Color(0xFFBDECD6),foregroundColor:midnight),
-                icon:const Icon(Icons.home_outlined,size:19),
-                label:Text(s.t('احجز سحباً منزلياً','Book home collection'))),
-            ])),
-        ]))),
-      Section(s.t('كيف نعتني بك اليوم؟','How can we care for you?')),
-      TileGrid(children:[
-        FeatureTile(Icons.science_outlined,s.t('باقات الفحوصات','Test packages'),
-          s.t('خيارات تناسب احتياجك','Carefully grouped panels'),
-          onTap:()=>go(context,const ExploreScreen(standalone:true))),
-        FeatureTile(Icons.medical_services_outlined,s.t('استشارة طبيب','Find a doctor'),
-          s.t('رعاية تبدأ بالاستماع','Care starts with listening'),
-          onTap:()=>go(context,const ExploreScreen(initialKind:'doctors',standalone:true))),
-        FeatureTile(Icons.biotech,s.t('المختبرات','Laboratories'),
-          s.t('اكتشف الفروع','Explore nearby branches'),
-          onTap:()=>go(context,const ExploreScreen(initialKind:'labs',standalone:true))),
-        FeatureTile(Icons.medication_outlined,s.t('الصيدلية','Pharmacy'),
-          s.t('الوصفات والطلبات','Prescriptions & requests'),color:amber,
-          onTap:()=>go(context,const PharmacyScreen())),
-      ]),
-      Section(s.t('ملفك الصحي','Your health, at a glance'),action:s.t('كل النتائج','All results'),onTap:()=>onTab(1)),
-      if(s.patientReports.isNotEmpty) Panel(onTap:()=>go(context,ReportScreen(s.patientReports.first)),
-        child:Row(children:[
-          const Glyph(Icons.task_alt,size:54),const SizedBox(width:14),
-          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-            Text(s.t('نتيجتك جاهزة للاطلاع','Your report is ready'),
-              style:const TextStyle(fontSize:16,fontWeight:FontWeight.w800)),
-            const SizedBox(height:5),Text(s.t('صورة الدم الكاملة • 05 أكتوبر','Blood count • 05 October'),
-              style:TextStyle(color:muted(context),fontSize:12)),
-          ])),const Icon(Icons.chevron_left,color:accent),
-        ]))
-      else EmptyState(s.t('بداية ملف صحي جديد','A fresh health profile'),
-        s.t('لا توجد نتائج لهذا الفرد حتى الآن.','No reports for this family member yet.')),
-      if(upcoming.isNotEmpty) ...[
-        Section(s.t('موعدك القادم','Your next appointment')),
-        BookingCard(upcoming.first),
-      ],
-      Section(s.t('مختارة لاهتمامك','Made for everyday wellbeing'),
-        action:s.t('استكشف','Explore'),onTap:()=>onTab(2)),
-      TileGrid(minWidth:250,children:services.where((e)=>e.kind=='packages').take(2).map(ServiceCard.new).toList()),
-      const SizedBox(height:14),
-      Panel(onTap:()=>go(context,const RewardsScreen()),child:Row(children:[
-        const Glyph(Icons.workspace_premium_outlined,color:amber),const SizedBox(width:14),
-        Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-          Text(s.t('كل اهتمام، يعود إليك','Your care comes full circle'),
-            style:const TextStyle(fontWeight:FontWeight.w800)),
-          const SizedBox(height:4),Text(s.t('${s.points} نقطة تجريبية في رصيدك',
-            '${s.points} demo points in your balance'),style:TextStyle(color:muted(context),fontSize:12)),
-        ])),const Icon(Icons.arrow_outward,size:20),
-      ])),
-      Section(s.t('مساحة لصحتك','A little space for your health')),
-      ActionRow(Icons.auto_awesome_outlined,s.t('مساعدك الصحي','Your health assistant'),
-        subtitle:s.t('معاينة تجربة المساعد الذكي','Preview the assistant experience'),
-        onTap:()=>go(context,const AssistantScreen())),
-      ActionRow(Icons.menu_book_outlined,s.t('دليل التحضير والزيارة','Preparation & visit guide'),
-        subtitle:s.t('معلومات الباقات وسير الزيارة','Package information and visit flow'),
-        onTap:()=>go(context,const ArticlesScreen())),
-    ]);
-  }
+  @override Widget build(BuildContext context) => ExperienceHome(onTab:onTab);
 }
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key,this.initialKind='packages',this.standalone=false,this.collection});
@@ -135,6 +50,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
       if(kind=='home') Note(s.t('اختر الباقة، ثم اختر السحب المنزلي في خطوات الحجز.',
         'Choose a package, then select home collection during booking.')),
       const SizedBox(height:20),
+      if(kind=='packages'||kind=='home') ActionRow(Icons.compare_arrows,s.t('قارن الباقات جنباً إلى جنب','Compare packages side by side'),
+        subtitle:s.t('الأسعار، عدد الفحوصات والمختبر','Prices, test counts and laboratories'),
+        onTap:()=>go(context,const PackageComparisonScreen())),
       if(source.isEmpty) EmptyState(s.t('لا توجد نتائج','No matches'),
         s.t('جرّب كلمة أخرى أو غيّر الفلاتر.','Try another keyword or change the filters.'),icon:Icons.search_off)
       else TileGrid(minWidth:260,children:source.map(ServiceCard.new).toList()),

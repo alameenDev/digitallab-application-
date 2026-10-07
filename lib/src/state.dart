@@ -79,8 +79,8 @@ const markers = [
 class Booking {
   Booking({required this.id,required this.serviceId,required this.patientId,
     required this.date,required this.phone,required this.address,required this.notes,
-    required this.mode,required this.payment,required this.total,required this.discount});
-  final String id,serviceId,patientId,phone,address,notes,mode,payment;
+    required this.mode,required this.payment,required this.total,required this.discount,this.voucherCode=''});
+  final String id,serviceId,patientId,phone,address,notes,mode,payment,voucherCode;
   final int total,discount;
   DateTime date;
   String status = 'upcoming';
@@ -117,6 +117,47 @@ class AppStore extends ChangeNotifier {
     'results':true,'bookings':true,'offers':false,'marketing':false,'ai':false,'biometric':false,
   };
   int points = 2450;
+  final int lifetimePoints = 2450;
+  final Set<int> viewedStories = {};
+  final Set<String> compareIds = {'wellness','vitamins'};
+  final Map<String,Set<int>> careChecks = {};
+  final Map<String,String> visitQuestions = {};
+  final List<RewardVoucher> vouchers = [];
+  int get tierIndex => lifetimePoints>=5000 ? 3 : lifetimePoints>=2000 ? 2 : lifetimePoints>=1000 ? 1 : 0;
+  double get tierProgress {
+    const floors=[0,1000,2000,5000];
+    if(tierIndex==3)return 1;
+    return (lifetimePoints-floors[tierIndex])/(floors[tierIndex+1]-floors[tierIndex]);
+  }
+  void checkCare(String id,int task,bool done) {
+    final checks=careChecks.putIfAbsent(id,()=> <int>{});
+    done?checks.add(task):checks.remove(task);update();
+  }
+  bool toggleComparison(String id) {
+    if(!services.any((v)=>v.id==id&&v.kind=='packages'))return false;
+    if(compareIds.contains(id)){compareIds.remove(id);update();return true;}
+    if(compareIds.length>=3)return false;
+    compareIds.add(id);update();return true;
+  }
+  RewardVoucher? claimReward(int cost) {
+    if(![500,1000,1500].contains(cost)||points<cost)return null;
+    points-=cost;
+    final voucher=RewardVoucher('DLG-${1001+vouchers.length}',cost,cost*10);
+    vouchers.add(voucher);rewards.add(voucher.code);update();return voucher;
+  }
+  int discountFor(Service service,String code) {
+    final normal=promoDiscount(service,code);
+    if(normal>0)return normal;
+    if(service.kind!='packages')return 0;
+    for(final v in vouchers) {
+      if(v.code==code.trim().toUpperCase()&&!v.used)return math.min(v.amount,service.price);
+    }
+    return 0;
+  }
+  void useVoucher(String code) {
+    for(final v in vouchers){if(v.code==code.trim().toUpperCase())v.used=true;}
+    update();
+  }
   bool loggedInDemo = true;
   String t(String ar,String en) => arabic ? ar : en;
   Patient get patient => patients.firstWhere((p) => p.id == patientId);
@@ -131,14 +172,23 @@ class AppStore extends ChangeNotifier {
     patients.add(Patient('p${patients.length+1}',name,relation:relation)); update();
   }
   void addBooking(Booking value) { bookings.add(value); update(); }
-  void cancelBooking(Booking value) { value.status = 'cancelled'; update(); }
-  void redeem() {
-    if (points < 500) return;
-    points -= 500; rewards.add('DEMO-${rewards.length+1}'); update();
+  void cancelBooking(Booking value) {
+    if(value.status!='upcoming')return;
+    value.status='cancelled';
+    for(final v in vouchers){if(v.code==value.voucherCode)v.used=false;}
+    update();
   }
+  void redeem() { claimReward(500); }
 }
 String dateLabel(DateTime d) => '${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year} • ${d.hour.toString().padLeft(2,'0')}:${d.minute.toString().padLeft(2,'0')}';
 bool validIraqiPhone(String value) => RegExp(r'^(?:\+964|00964|0)7[3-9]\d{8}$').hasMatch(value.replaceAll(RegExp(r'[\s-]'),''));
 int promoDiscount(Service service,String code) =>
   service.kind == 'packages' && code.trim().toUpperCase() == 'DIGITAL10'
     ? math.min(10000,(service.price * .1).round()) : 0;
+
+class RewardVoucher {
+  RewardVoucher(this.code,this.cost,this.amount);
+  final String code;
+  final int cost,amount;
+  bool used=false;
+}
