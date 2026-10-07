@@ -1,7 +1,7 @@
 name: Flutter checks
 on:
   push:
-    branches: [main]
+    branches: [main, feature/patient-mobile-link-20261007]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -39,6 +39,13 @@ jobs:
         run: |
           python3 -m http.server 8000 --directory build/web > "$RUNNER_TEMP/web-server.log" 2>&1 &
           node tool/capture.cjs
+      - name: Build patient linking mode
+        run: flutter build web --release --dart-define=PATIENT_API_BASE_URL=https://lab.example.test/api --pwa-strategy=none
+      - name: Upload patient linking build
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-lab-patient-link
+          path: build/web
       - name: Upload previews
         if: always()
         uses: actions/upload-artifact@v4
