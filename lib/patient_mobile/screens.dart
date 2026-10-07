@@ -299,6 +299,9 @@ class _Measurement extends StatelessWidget {
       if(ranges.isNotEmpty) Padding(padding:const EdgeInsets.only(top:8),
         child:Text('Reference range: '+ranges.map(_range).where((v)=>v.isNotEmpty).join(' | '),textDirection:TextDirection.ltr,
           style:const TextStyle(fontSize:12,color:Colors.grey,height:1.7))),
+      if(ranges.isNotEmpty && item['range_source']=='current') const Padding(
+        padding:EdgeInsets.only(top:6),child:Text('النطاقات المرجعية من إعدادات المختبر الحالية.',
+          style:TextStyle(fontSize:11,color:Colors.grey))),
       if(_string(item['comment'])!='—') Padding(padding:const EdgeInsets.only(top:10),child:Text(_string(item['comment']))),
       ...parts.map((part)=>_Measurement(item:Map<String,dynamic>.from(part))),
     ]));
