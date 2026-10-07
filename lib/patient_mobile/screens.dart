@@ -150,6 +150,7 @@ class _PatientMobileRootState extends State<PatientMobileRoot> {
       ]),
       const SizedBox(height:16),
       SizedBox(width:double.infinity,child:FilledButton.icon(
+        key:ValueKey('patient-report-open-'+report['id'].toString()),
         onPressed:ready?()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>LinkedReportScreen(
           api:s.api,profile:s.selected!,reportId:(report['id'] as num).toInt()))):null,
         icon:Icon(ready?Icons.description_outlined:Icons.hourglass_empty,size:19),

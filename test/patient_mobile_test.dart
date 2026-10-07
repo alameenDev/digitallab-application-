@@ -129,12 +129,12 @@ void main() {
     expect(find.text('120 نقطة'),findsOneWidget);
     expect(find.text('مختبر اختبار 1'),findsWidgets);
     await tester.tap(find.text('تقاريري'));await tester.pumpAndSettle();
-    final pending=find.widgetWithText(FilledButton,'بانتظار اعتماد التقرير');
-    await tester.ensureVisible(pending);
+    final pending=find.byKey(const ValueKey('patient-report-open-12'));
+    await tester.scrollUntilVisible(pending,250);
     expect(tester.widget<FilledButton>(pending).onPressed,isNull);
     expect(requests.where((r)=>r.url.path.endsWith('/reports/12')),isEmpty);
-    final ready=find.widgetWithText(FilledButton,'عرض النتائج');
-    await tester.ensureVisible(ready);await tester.tap(ready);await tester.pumpAndSettle();
+    final ready=find.byKey(const ValueKey('patient-report-open-11'));
+    await tester.scrollUntilVisible(ready,-250);await tester.tap(ready);await tester.pumpAndSettle();
     expect(find.text('91 mg/dL'),findsOneWidget);
     expect(find.textContaining('Reference range'),findsOneWidget);
     expect(tester.takeException(),isNull);
