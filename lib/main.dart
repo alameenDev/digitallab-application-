@@ -70,11 +70,13 @@ class _AppShellState extends State<AppShell> {
       appBar: AppBar(
         title: Row(mainAxisSize: MainAxisSize.min, children: [
           const BrandMark(size: 34), const SizedBox(width: 10),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Digital Lab', style: TextStyle(fontSize: 18,fontWeight: FontWeight.w800)),
+          Expanded(child:Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Digital Lab', maxLines:1,overflow:TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 18,fontWeight: FontWeight.w800)),
             Text(s.t('المختبر الرقمي','YOUR HEALTH, CONNECTED'),
+              maxLines:1,overflow:TextOverflow.ellipsis,
               style: TextStyle(fontSize: 10,letterSpacing: s.arabic ? 0 : 1.5,color: muted(context))),
-          ]),
+          ])),
         ]),
         actions: [
           IconButton(tooltip: s.t('تغيير اللغة','Change language'),
