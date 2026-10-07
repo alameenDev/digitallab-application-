@@ -40,6 +40,7 @@ jobs:
           python3 -m http.server 8000 --directory build/web > "$RUNNER_TEMP/web-server.log" 2>&1 &
           node tool/capture.cjs
       - name: Upload previews
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: digital-lab-previews

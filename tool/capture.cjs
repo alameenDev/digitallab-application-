@@ -9,17 +9,18 @@ const fs = require('fs');
   await page.goto('http://127.0.0.1:8000', { waitUntil: 'networkidle' });
   await page.waitForFunction(() => document.querySelector('flutter-view') !== null, null, { timeout: 60000 });
   await page.waitForTimeout(3500);
+  await page.screenshot({ path: 'previews/initial-mobile.png' });
   const semantics = page.locator('flt-semantics-placeholder');
   if (await semantics.count()) await semantics.evaluate(element => element.click());
   await page.waitForTimeout(500);
   const first = page.getByRole('button', { name: 'عرض البانر 1', exact: true });
   if (await first.count()) {
     for (let i = 1; i <= 3; i++) {
-      await page.getByRole('button', { name: 'عرض البانر ' + i, exact: true }).click();
+      await page.getByRole('button', { name: 'عرض البانر ' + i, exact: true }).dispatchEvent('click');
       await page.waitForTimeout(500);
       await page.screenshot({ path: 'previews/banner-' + i + '-mobile.png' });
     }
-    await first.click();
+    await first.dispatchEvent('click');
     await page.waitForTimeout(500);
   }
   await page.screenshot({ path: 'previews/home-ar-mobile.png' });
