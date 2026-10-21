@@ -71,7 +71,7 @@ class _HomeVisitRequestScreenState extends State<HomeVisitRequestScreen> {
       Heading(service.name, subtitle: service.lab.title(s)), const CarePreviewNote(),
       Form(key: form, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Section(s.t('المريض ومعلومات التواصل', 'Patient & contact')),
-        DropdownButtonFormField<String>(value: person, isExpanded: true,
+        DropdownButtonFormField<String>(key: const ValueKey('home-patient'), value: person, isExpanded: true,
           decoration: InputDecoration(labelText: s.t('الخدمة لمن؟', 'Who is this for?')),
           items: s.patients.map((p) => DropdownMenuItem(value: p.id, child: Text(p.name))).toList(),
           onChanged: (v) => setState(() => person = v)), const SizedBox(height: 14),
@@ -112,6 +112,7 @@ class _HomeVisitRequestScreenState extends State<HomeVisitRequestScreen> {
             'I agree to create a demo request. No collector is dispatched and no payment is taken.'))),
         const SizedBox(height: 12), FilledButton.icon(key: const ValueKey('home-submit'),
           onPressed: submitted ? null : () {
+            if (submitted) return;
             if (!form.currentState!.validate()) return;
             if (!consent) { toast(context, s.t('أكّد الموافقة أولاً', 'Please acknowledge the demo first')); return; }
             if (quotedFee != service.fee) {
@@ -125,6 +126,7 @@ class _HomeVisitRequestScreenState extends State<HomeVisitRequestScreen> {
                 scheduledAt: DateTime(date.year, date.month, date.day, hour!),
                 location: GeoPoint.parse(fields['lat']!.text, fields['lng']!.text));
               setState(() => submitted = true);
+              s.selectPatient(request.patientId);
               Navigator.of(context).pushReplacement(MaterialPageRoute<void>(builder: (_) => HomeVisitDetailScreen(request.id)));
             } on FormatException {
               toast(context, s.t('راجع الموعد والمنطقة والبيانات؛ قد يكون توفر الخدمة تغيّر.',

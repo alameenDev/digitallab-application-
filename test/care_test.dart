@@ -117,7 +117,10 @@ void main() {
     tester.view.physicalSize = const Size(500, 1500); tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize); addTearDown(tester.view.resetDevicePixelRatio);
     final s = AppStore()..arabic = false;
+    s.addPatient('Child demo', 'Child');
     await tester.pumpWidget(careHost(s, const HomeVisitRequestScreen(serviceId: 'home-life')));
+    await tester.tap(find.byKey(const ValueKey('home-patient'))); await tester.pumpAndSettle();
+    await tester.tap(find.text('Child demo').last); await tester.pumpAndSettle();
     for (final e in {'phone': '07701234567', 'tests': 'CBC and glucose', 'address': 'Demo street house 12',
       'landmark': 'Demo gate', 'lat': '33.3', 'lng': '44.3', 'notes': 'Call at the door'}.entries) {
       await tester.ensureVisible(find.byKey(ValueKey('home-${e.key}')));
@@ -132,6 +135,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('home-submit'))); await tester.pumpAndSettle();
     expect(s.homeVisitRequests, hasLength(1));
     final r = s.homeVisitRequests.single;
+    expect(r.patientId, 'p2'); expect(s.patientId, 'p2');
     expect(r.tests, 'CBC and glucose'); expect(r.notes, 'Call at the door');
     expect(r.location!.longitude, 44.3); expect(r.service.fee, 10000);
     expect(find.byKey(const ValueKey('home-advance')), findsNothing);
