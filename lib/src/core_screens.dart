@@ -19,6 +19,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final s=AppScope.of(context);
+    if(kind=='doctors' && area!='all' && !s.doctors.any((d)=>d.active && d.area==area)) area='all';
     final source=s.catalogServices.where((v)=>
       (widget.collection=='favorites' ? s.favorites.contains(v.id) :
        widget.collection=='recent' ? s.recent.contains(v.id) :

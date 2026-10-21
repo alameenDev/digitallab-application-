@@ -46,6 +46,12 @@ jobs:
         with:
           name: digital-lab-care-admin
           path: build/admin-web
+      - name: Capture care administration preview
+        env:
+          NODE_PATH: ${{ runner.temp }}/browser/node_modules
+        run: |
+          python3 -m http.server 8001 --directory build/admin-web > "$RUNNER_TEMP/care-server.log" 2>&1 &
+          node tool/capture-care.cjs
       - name: Build patient linking mode
         run: flutter build web --release --dart-define=PATIENT_API_BASE_URL=https://lab.example.test/api --pwa-strategy=none
       - name: Upload patient linking build
