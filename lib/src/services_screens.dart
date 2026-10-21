@@ -400,6 +400,9 @@ class AdminScreen extends StatelessWidget {
         FeatureTile(Icons.rate_review_outlined,'${s.reviews.length}',s.t('ملاحظة محفوظة','Saved feedback'),
           onTap:()=>go(context,const AdminModuleScreen('feedback'))),
       ]),
+      ActionRow(Icons.dashboard_customize_outlined,s.t('إدارة الأطباء والسحب المنزلي','Manage doctors & home collection'),
+        subtitle:s.t('صور ومواقع الأطباء، الخدمات وطلبات الزيارات','Doctor photos and maps, services and visit requests'),
+        onTap:()=>go(context,const CareAdminScreen())),
       Section(s.t('مساحات الإدارة','Administration areas')),
       ...[
         ('providers',Icons.verified_outlined,s.t('المختبرات والأطباء والفروع','Providers & branches')),

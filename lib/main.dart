@@ -1,4 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'patient_mobile/screens.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
@@ -12,13 +16,17 @@ part 'src/core_screens.dart';
 part 'src/booking.dart';
 part 'src/account_screens.dart';
 part 'src/services_screens.dart';
+part 'src/care_directory.dart';
+part 'src/doctor_screens.dart';
+part 'src/home_visit_screens.dart';
 
 const patientApiBaseUrl = String.fromEnvironment('PATIENT_API_BASE_URL');
 void main() => runApp(DigitalLabApp());
 
 class DigitalLabApp extends StatefulWidget {
-  DigitalLabApp({super.key, AppStore? store}) : store = store ?? AppStore();
+  DigitalLabApp({super.key, AppStore? store, this.adminPreview = false}) : store = store ?? AppStore();
   final AppStore store;
+  final bool adminPreview;
   @override
   State<DigitalLabApp> createState() => _DigitalLabAppState();
 }
@@ -45,7 +53,7 @@ class _DigitalLabAppState extends State<DigitalLabApp> {
             child: child!,
           );
         },
-        home: patientApiBaseUrl.isEmpty ? const AppShell() : const PatientMobileRoot(baseUrl: patientApiBaseUrl),
+        home: widget.adminPreview ? const CareAdminScreen() : patientApiBaseUrl.isEmpty ? const AppShell() : const PatientMobileRoot(baseUrl: patientApiBaseUrl),
       ),
     ),
   );

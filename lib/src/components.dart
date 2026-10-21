@@ -252,7 +252,7 @@ class ServiceCard extends StatelessWidget {
     return Padding(padding:const EdgeInsets.only(bottom:12),child:Panel(
       onTap:(){s.recent.add(service.id);s.update();go(context,ServiceScreen(service));},
       child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Row(children:[Glyph(service.icon,size:54),const Spacer(),
+        Row(children:[if(service.kind=='doctors') DoctorAvatar(s.doctorById(service.id),size:54) else Glyph(service.icon,size:54),const Spacer(),
           if(service.kind=='packages') Tag(s.t('باقة فحوصات','TEST PACKAGE')),
           IconButton(tooltip:s.t('المفضلة','Favorite'),
             onPressed:()=>s.favorite(service.id),

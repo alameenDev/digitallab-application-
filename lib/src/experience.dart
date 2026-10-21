@@ -494,59 +494,9 @@ class FamilyHub extends StatelessWidget {
     ]);
   }
 }
-class HomeCollectionHub extends StatefulWidget {
+class HomeCollectionHub extends StatelessWidget {
   const HomeCollectionHub({super.key});
-  @override State<HomeCollectionHub> createState()=>_HomeCollectionHubState();
-}
-class _HomeCollectionHubState extends State<HomeCollectionHub> {
-  String selected='wellness';
-  @override Widget build(BuildContext context) {
-    final s=AppScope.of(context);
-    final item=services.firstWhere((v)=>v.id==selected);
-    final ongoing=s.bookings.where((b)=>b.home&&b.patientId==s.patientId&&b.status=='upcoming').toList();
-    return DetailPage(title:s.t('فحوصات من البيت','Care at home'),children:[
-      Panel(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Row(children:[
-          Expanded(child:Heading(s.t('راحتك جزء\nمن العناية.','Your comfort.\nPart of your care.'),
-            subtitle:s.t('معاينة السحب المنزلي','Home collection preview'))),
-          SizedBox(width:105,height:140,child:CustomPaint(painter:CareArtwork(0))),
-        ]),
-        Text(s.t('اختَر الباقة وشوف التكلفة قبل ما تكمل الحجز.',
-          'Choose a package and see the price before booking.'),style:TextStyle(color:muted(context),height:1.7)),
-      ])),
-      const SizedBox(height:20),
-      DropdownButtonFormField<String>(value:selected,isExpanded:true,
-        decoration:InputDecoration(labelText:s.t('الباقة','Package')),
-        items:services.where((v)=>v.kind=='packages').map((v)=>DropdownMenuItem(
-          value:v.id,child:Text(v.title(s),overflow:TextOverflow.ellipsis))).toList(),
-        onChanged:(v)=>setState(()=>selected=v!)),
-      const SizedBox(height:16),
-      Panel(child:Column(children:[
-        quoteLine(s.t('سعر الباقة','Package price'),s.money(item.price)),
-        const SizedBox(height:12),quoteLine(s.t('السحب المنزلي','Home collection'),s.money(10000)),
-        const Divider(),quoteLine(s.t('الإجمالي التجريبي','Demo total'),s.money(item.price+10000)),
-      ])),
-      const SizedBox(height:18),
-      FilledButton.icon(key:const ValueKey('home-collection-book'),onPressed:()=>go(context,BookingScreen(item,home:true)),
-        icon:const Icon(Icons.calendar_month_outlined),label:Text(s.t('اختَر الموعد والعنوان','Choose time & address'))),
-      Section(s.t('رحلة واضحة من البداية','Know the journey')),
-      ...[(Icons.edit_calendar,s.t('1 • اختَر وقتك','1 • Choose a time')),
-        (Icons.home_outlined,s.t('2 • استقبل الفني','2 • Meet your collector')),
-        (Icons.science_outlined,s.t('3 • تابع العينة','3 • Follow the sample')),
-        (Icons.description_outlined,s.t('4 • افتح النتيجة','4 • View the report'))]
-        .map((v)=>ActionRow(v.$1,v.$2,trailing:const SizedBox.shrink())),
-      if(ongoing.isNotEmpty) ...[
-        Section(s.t('طلباتي الحالية','My active requests')),
-        ...ongoing.map((b)=>ActionRow(Icons.route_outlined,b.id,subtitle:b.service.title(s),
-          onTap:()=>go(context,TrackingScreen(b)))),
-      ],
-      Note(s.t('الأسعار والتغطية والتتبع تجريبية. لا يتم إرسال فني فعلي في هذه النسخة.',
-        'Prices, coverage and tracking are simulated. No real collector is dispatched in this version.')),
-    ]);
-  }
-  Widget quoteLine(String title,String value)=>Row(children:[
-    Expanded(child:Text(title)),const SizedBox(width:10),Text(value,style:const TextStyle(fontWeight:FontWeight.w800)),
-  ]);
+  @override Widget build(BuildContext context) => const HomeServiceCatalog();
 }
 
 class PackageComparisonScreen extends StatelessWidget {
