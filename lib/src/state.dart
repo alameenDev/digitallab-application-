@@ -79,14 +79,15 @@ const markers = [
 class Booking {
   Booking({required this.id,required this.serviceId,required this.patientId,
     required this.date,required this.phone,required this.address,required this.notes,
-    required this.mode,required this.payment,required this.total,required this.discount,this.voucherCode=''});
+    required this.mode,required this.payment,required this.total,required this.discount,this.voucherCode='',this.serviceSnapshot});
+  final Service? serviceSnapshot;
   final String id,serviceId,patientId,phone,address,notes,mode,payment,voucherCode;
   final int total,discount;
   DateTime date;
   String status = 'upcoming';
   int progress = 0;
   bool get home => mode == 'home';
-  Service get service => services.firstWhere((e) => e.id == serviceId);
+  Service get service => serviceSnapshot ?? services.firstWhere((e) => e.id == serviceId);
 }
 class ShareGrant {
   ShareGrant(this.patientId,this.recipient,this.scope,this.expires);
@@ -102,6 +103,10 @@ class ReminderItem {
   bool done = false;
 }
 class AppStore extends ChangeNotifier {
+  final List<DoctorProfile> doctors = initialDoctors();
+  final List<HomeVisitService> homeVisitServices = initialHomeVisitServices();
+  final List<HomeVisitRequest> homeVisitRequests = [];
+  int careSequence = 1;
   bool arabic = true;
   ThemeMode themeMode = ThemeMode.light;
   double textScale = 1;

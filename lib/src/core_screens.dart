@@ -19,12 +19,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   Widget build(BuildContext context) {
     final s=AppScope.of(context);
-    final source=services.where((v)=>
+    if(kind=='doctors' && area!='all' && !s.doctors.any((d)=>d.active && d.area==area)) area='all';
+    final source=s.catalogServices.where((v)=>
       (widget.collection=='favorites' ? s.favorites.contains(v.id) :
        widget.collection=='recent' ? s.recent.contains(v.id) :
        v.kind==(kind=='home'?'packages':kind)) &&
       '${v.ar} ${v.en} ${v.subAr} ${v.subEn}'.toLowerCase().contains(query.toLowerCase()) &&
-      (area=='all' || (area=='mansour' ? v.subEn.contains('Mansour') : v.subEn.contains('Karrada')))).toList();
+      (area=='all' || (kind=='doctors' ? s.doctorById(v.id)?.area==area : area=='mansour' ? v.subEn.contains('Mansour') : v.subEn.contains('Karrada')))).toList();
     final title=widget.collection=='favorites'?s.t('المفضلة','Favorites'):
       widget.collection=='recent'?s.t('شاهدتها مؤخراً','Recently viewed'):s.t('اكتشف رعايتك','Discover your care');
     final children=<Widget>[
@@ -44,11 +45,12 @@ class _ExploreScreenState extends State<ExploreScreen> {
       if(kind=='labs'||kind=='doctors') Padding(padding:const EdgeInsets.only(top:12),
         child:DropdownButtonFormField<String>(value:area,decoration:InputDecoration(labelText:s.t('المنطقة','Area')),
           items:[DropdownMenuItem(value:'all',child:Text(s.t('كل المناطق','All areas'))),
-            DropdownMenuItem(value:'mansour',child:Text(s.t('المنصور','Mansour'))),
-            DropdownMenuItem(value:'karrada',child:Text(s.t('الكرادة','Karrada')))],
+            if(kind=='doctors') ...s.doctors.where((d)=>d.active).map((d)=>d.area).toSet().map((a)=>DropdownMenuItem(value:a,child:Text(a)))
+            else ...[DropdownMenuItem(value:'mansour',child:Text(s.t('المنصور','Mansour'))),
+              DropdownMenuItem(value:'karrada',child:Text(s.t('الكرادة','Karrada')))]],
           onChanged:(v)=>setState(()=>area=v!))),
-      if(kind=='home') Note(s.t('اختر الباقة، ثم اختر السحب المنزلي في خطوات الحجز.',
-        'Choose a package, then select home collection during booking.')),
+      if(kind=='home') ActionRow(Icons.home_outlined,s.t('خدمات وطلبات السحب المنزلي','Home collection services & requests'),
+        subtitle:s.t('المختبرات والتغطية وأجور الزيارة','Laboratories, coverage and visit fees'),onTap:()=>go(context,const HomeCollectionHub())),
       const SizedBox(height:20),
       if(kind=='packages'||kind=='home') ActionRow(Icons.compare_arrows,s.t('قارن الباقات جنباً إلى جنب','Compare packages side by side'),
         subtitle:s.t('الأسعار، عدد الفحوصات والمختبر','Prices, test counts and laboratories'),
@@ -68,6 +70,7 @@ class ServiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s=AppScope.of(context);
+    if(service.kind=='doctors') return DoctorDetailScreen(service.id);
     final doctor=service.kind=='doctors',lab=service.kind=='labs';
     return DetailPage(title:s.t('تفاصيل الخدمة','Service details'),actions:[
       IconButton(tooltip:s.t('المفضلة','Favorite'),onPressed:()=>s.favorite(service.id),
@@ -106,7 +109,7 @@ class ServiceScreen extends StatelessWidget {
       FilledButton.icon(onPressed:()=>go(context,BookingScreen(service)),
         icon:const Icon(Icons.calendar_month_outlined),label:Text(s.t('اختيار الموعد','Choose an appointment'))),
       if(!doctor&&!lab) Padding(padding:const EdgeInsets.only(top:10),child:OutlinedButton.icon(
-        onPressed:()=>go(context,BookingScreen(service,home:true)),icon:const Icon(Icons.home_outlined),
+        onPressed:()=>go(context,HomeServiceCatalog(initialTests:service.title(s))),icon:const Icon(Icons.home_outlined),
         label:Text(s.t('أفضّل السحب المنزلي','I prefer home collection')))),
     ]);
   }
@@ -301,6 +304,9 @@ class _BookingsScreenState extends State<BookingsScreen> {
       Heading(s.t('كل موعد، خطوة للعناية','Every visit, a step toward care'),
         subtitle:s.t('رتّب زياراتك وتابع طلباتك بسهولة.','Organize your visits and follow your requests.')),
       const PatientPicker(),const SizedBox(height:18),
+      ActionRow(Icons.home_outlined,s.t('طلبات السحب المنزلي','Home collection requests'),
+        subtitle:s.t('الطلبات والحالة والفني المعيّن','Requests, status and assigned collector'),
+        onTap:()=>go(context,const MyHomeRequestsScreen())),
       Wrap(spacing:8,runSpacing:8,children:[
         for(final item in [('upcoming',s.t('القادمة','Upcoming')),('completed',s.t('المكتملة','Completed')),
           ('cancelled',s.t('الملغاة','Cancelled'))])

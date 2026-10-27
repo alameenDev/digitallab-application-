@@ -33,6 +33,10 @@ class _BookingScreenState extends State<BookingScreen> {
   @override Widget build(BuildContext context) {
     final s=AppScope.of(context);
     final service=widget.service;
+    if(service.kind=='doctors' && s.doctorById(service.id)?.active!=true) {
+      return DetailPage(title:s.t('طلب موعد','Request appointment'),children:[
+        EmptyState(s.t('الطبيب غير متاح حالياً','Doctor currently unavailable'),s.t('اختر طبيباً آخر.','Choose another doctor.'))]);
+    }
     if(!couponInitialized){
       couponInitialized=true;
       appliedCode=coupon.trim().toUpperCase();
@@ -152,7 +156,7 @@ class _BookingScreenState extends State<BookingScreen> {
                 'Voucher availability changed. Review the total and confirm again.'));return;
             }
             submitted=true;
-            final booking=Booking(id:'DL-${1001+s.bookings.length}',serviceId:service.id,patientId:patientId!,
+            final booking=Booking(serviceSnapshot:service,id:'DL-${1001+s.bookings.length}',serviceId:service.id,patientId:patientId!,
               date:DateTime(date.year,date.month,date.day,hour),phone:phone.trim(),
               address:mode=='home'?address.trim():'',notes:notes.trim(),mode:mode,payment:payment,
               total:total,discount:discount,voucherCode:discount>0?appliedCode:'');

@@ -1,7 +1,7 @@
 name: Flutter checks
 on:
   push:
-    branches: [main, feature/patient-mobile-link-20261007]
+    branches: [main, feature/patient-mobile-link-20261007, feature/doctors-home-visits-20261021]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -39,6 +39,19 @@ jobs:
         run: |
           python3 -m http.server 8000 --directory build/web > "$RUNNER_TEMP/web-server.log" 2>&1 &
           node tool/capture.cjs
+      - name: Build care administration preview
+        run: flutter build web --release --target lib/admin_main.dart --output build/admin-web --pwa-strategy=none
+      - name: Upload care administration preview
+        uses: actions/upload-artifact@v4
+        with:
+          name: digital-lab-care-admin
+          path: build/admin-web
+      - name: Capture care administration preview
+        env:
+          NODE_PATH: ${{ runner.temp }}/browser/node_modules
+        run: |
+          python3 -m http.server 8001 --directory build/admin-web > "$RUNNER_TEMP/care-server.log" 2>&1 &
+          node tool/capture-care.cjs
       - name: Build patient linking mode
         run: flutter build web --release --dart-define=PATIENT_API_BASE_URL=https://lab.example.test/api --pwa-strategy=none
       - name: Upload patient linking build
